@@ -22,6 +22,11 @@
         "impossibleLost": "impossibleLost"
 
     },
+    "currentlyPlayingTableName": "currentlyPlaying",
+    "currentlyPlayingTableColumns":
+    {
+        "chatId":"chatId"
+    },
     "maxHints":2,
     "rules":"Rules.txt",
     "info":"Info.txt"

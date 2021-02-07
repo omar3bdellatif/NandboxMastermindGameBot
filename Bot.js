@@ -3,14 +3,10 @@ const NandBox = require("nandbox-bot-api/src/NandBox");
 const Nand = require("nandbox-bot-api/src/NandBoxClient");
 const NandBoxClient = Nand.NandBoxClient;
 const TextOutMessage = require("nandbox-bot-api/src/outmessages/TextOutMessage");
-const UpdateOutMessage = require("nandbox-bot-api/src/outmessages/UpdateOutMessage");
 const Button = require("nandbox-bot-api/src/data/Button");
-const Row = require("nandbox-bot-api/src/data/Row");
-const Menu = require("nandbox-bot-api/src/data/Menu");
-const funcs = require("./funcs");
 const Menus = require("./Menus");
+
 const MenuItems = require("./MenuItems");
-const SetChatMenuOutMessage = require("nandbox-bot-api/src/outmessages/SetChatMenuOutMessage");
 const SetNavigationButtonOutMessage = require("nandbox-bot-api/src/outmessages/SetNavigationButtonOutMessage");
 const Utils = require("nandbox-bot-api/src/util/Utility");
 const db = require("./db")
@@ -31,9 +27,6 @@ const config = {
     DownloadServer: configFile.DownloadServer,
     UploadServer: configFile.UploadServer
 }
-const botId = TOKEN.substring(0,TOKEN.indexOf(':'))
-
-
 
 
 var client = NandBoxClient.get(config);
@@ -43,38 +36,18 @@ var api = null;
 
 //DB
 const dataBase = new db(data.dbPath);
-dataBase.createRecordTable();
-
 
 let chatToState = {};
+
+
 
 nCallBack.onConnect = (_api) => {
     // it will go here if the bot connected to the server successfuly 
     api = _api;
     console.log("Authenticated");
+    dataBase.createRecordTable();
+    dataBase.createCurrentlyPlayingTable();
 }
-
-
-
-
-
-
-function setNavigationButton(chatId, nextMenu, api){
-    let fb = new Button();
-    fb.next_menu = nextMenu;
-    let navMsg = new SetNavigationButtonOutMessage();
-    navMsg.chat_id = chatId;
-    navMsg.navigation_buttons = []
-    navMsg.navigation_buttons.push(fb);
-
-    api.send(JSON.stringify(navMsg));
-}
-
-
-
-
-
-
 
 nCallBack.onReceive = incomingMsg => {
     let chatId = incomingMsg.chat.id;
@@ -100,7 +73,7 @@ nCallBack.onReceive = incomingMsg => {
                     
                     reference = Id();
                     MenuItems.newGameMenuItems.actions.item5(chatId,api,incomingMsg.from.name,incomingMsg.from.id,null,chatToState,dataBase)
-                    console.log(chatToState)
+                    //console.log(chatToState)
                     dataBase.addInitialRecord(chatId,incomingMsg.from.name)
                 }
                 break;
@@ -140,11 +113,7 @@ nCallBack.onChatMenuCallBack = chatMenuCallback => {
         
         switch (state)
         {
-            case 0:
-                console.log(`Case 0`)
-                validItems = MenuItems.startMenuItems;
-                break;
-            //new game menu    
+            //difficulty selection menu
             case 1:
                 console.log('Case 1')
                 validItems = MenuItems.newGameMenuItems;
@@ -157,6 +126,10 @@ nCallBack.onChatMenuCallBack = chatMenuCallback => {
                 break;
         }
     }
+    else
+    {
+        validItems = MenuItems.startMenuItems;
+    }
 
     console.log(`callback is ${callBack}`)
     for(key in validItems.callBacks)
@@ -168,13 +141,30 @@ nCallBack.onChatMenuCallBack = chatMenuCallback => {
             //perform the action related to that item
             console.log(`Menu Item clicked is ${validItems.callBacks[key]}`)
 
-            validItems.actions[key](chatId,api,chatToState[chatId].name,chatMenuCallback.from.id,callBack,chatToState,dataBase)
-            chatToState[chatId].state = validItems.state[key]
+            validItems.actions[key](chatId,api,chatMenuCallback.from.name,chatMenuCallback.from.id,callBack,chatToState,dataBase)
+            if(chatId in chatToState)
+            {
+                chatToState[chatId].state = validItems.state[key]
+            }
             console.log(chatToState)
-            break
+            return
         }
     }
 
+    //FUNCTION
+    //This means that the bot went down and came back, while the user was in a state that is either 1 or 2
+    //MenuItems.newGameMenuItems.actions.item5(chatId,api,chatMenuCallback.from.name,chatMenuCallback.from.id,null,chatToState,dataBase)
+    //Send an apology message to explain what happened
+    let outMsg = new TextOutMessage();
+    outMsg.chat_Id = chatId;
+    outMsg.reference = Id();
+    outMsg.to_user_id = chatMenuCallback.from.id;
+    outMsg.text = `The bot went down and came back up, so You were taken back to the main menu. Sorry for any inconvenience.`
+    api.send(JSON.stringify(outMsg));
+    setTimeout(function(){
+        MenuItems.newGameMenuItems.actions.item5(chatId,api,chatMenuCallback.from.name,chatMenuCallback.from.id,callBack,chatToState,dataBase)
+    },200)
+    
 
 }
 
@@ -184,31 +174,62 @@ nCallBack.onChatMenuCallBack = chatMenuCallback => {
 
 nCallBack.onInlineMessageCallback = inlineMsgCallback => {
     let chatId = inlineMsgCallback.chat.id;
-    let userId = inlineMsgCallback.from.id;
-    let state = chatToState[chatId].state;
-    let msgId = inlineMsgCallback.message_id;
-    let reference = inlineMsgCallback.reference;
-    let callBack = inlineMsgCallback.button_callback;
-    console.log(`state is: ${state}`)
-    if(state === 2 && reference == chatToState[chatId].activeGameRef)
-    {
-        let validItems = MenuItems.keypadMenuItems
-        for(key in validItems.callBacks)
+
+    //add and in currentlyPLaying
+    dataBase.isCurrentlyPlaying(chatId).then((res) => {
+        if(res)
         {
-            console.log(`current item is ${validItems.callBacks[key]}`)
-            let menuItem = validItems.callBacks[key];
-            if(callBack === menuItem)
+            if(chatId in chatToState)
             {
-                //perform the action related to that item
-                console.log(`Menu Item clicked is ${validItems.callBacks[key]}`)
-
-                validItems.actions[key](chatId,api,chatToState[chatId].name,userId,callBack,chatToState,msgId,reference,dataBase)
-                //chatToState[chatId].state = validItems.state[key]
-                break
+                let userId = inlineMsgCallback.from.id;
+                let state = chatToState[chatId].state;
+                let msgId = inlineMsgCallback.message_id;
+                let reference = inlineMsgCallback.reference;
+                let callBack = inlineMsgCallback.button_callback;
+                console.log(`state is: ${state}`)
+                if(state === 2 && reference == chatToState[chatId].activeGameRef)
+                {
+                    let validItems = MenuItems.keypadMenuItems
+                    for(key in validItems.callBacks)
+                    {
+                        console.log(`current item is ${validItems.callBacks[key]}`)
+                        let menuItem = validItems.callBacks[key];
+                        if(callBack === menuItem)
+                        {
+                            //perform the action related to that item
+                            console.log(`Menu Item clicked is ${validItems.callBacks[key]}`)
+            
+                            validItems.actions[key](chatId,api,chatToState[chatId].name,userId,callBack,chatToState,msgId,reference,dataBase)
+                            //chatToState[chatId].state = validItems.state[key]
+                            break
+                        }
+                    }
+                }
             }
-        }
-    }
+            else
+            {
+                //Send an apology message to explain what happened
+                let outMsg = new TextOutMessage();
+                outMsg.chat_Id = chatId;
+                outMsg.reference = Id();
+                outMsg.to_user_id = inlineMsgCallback.from.id;
+                outMsg.text = `The bot went down and came back up, so you were taken back to the main menu. Sorry for any inconvenience.`
+                api.send(JSON.stringify(outMsg));
+                setTimeout(function(){
+                    MenuItems.newGameMenuItems.actions.item5(chatId,api,inlineMsgCallback.from.name,inlineMsgCallback.from.id,null,chatToState,dataBase)
+                },200)
+                
+                dataBase.removeCurrentlyPlaying(chatId)
 
+                return
+            }
+            
+        }
+        else
+        {
+            
+        }
+    })
         
 
 }

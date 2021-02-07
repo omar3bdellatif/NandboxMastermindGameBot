@@ -66,6 +66,67 @@ class dataBase {
         })
     }
 
+    createCurrentlyPlayingTable()
+    {
+        let sql = `CREATE TABLE IF NOT EXISTS ${data.currentlyPlayingTableName} (
+            chatId varchar(255) NOT NULL,    
+            PRIMARY KEY (chatId)
+            );`
+            this.db.run(sql,(err)=>{
+            if(err)
+            {
+                return console.log(err.message)
+            }
+            console.log(`Table has been created successfully`)
+        })
+    }
+
+    addCurrentlyPlaying(chatId)
+    {
+        let sql = `insert into ${data.currentlyPlayingTableName} values ("${chatId}")`
+        this.db.run(sql,(err)=>{
+            if(err)
+            {
+                return console.log(err.message)
+            }
+            console.log(`${chatId} is currently playing`)
+        })
+    }
+
+    isCurrentlyPlaying(chatId)
+    {
+        let sql = `select * from ${data.currentlyPlayingTableName} where ${data.currentlyPlayingTableColumns.chatId} = "${chatId}"`
+        return new Promise((resolve,reject) => {
+            this.db.all(sql,(err,result)=>{
+                if(err)
+                {
+                    reject(err.message)
+                }
+                if(result.length > 0)
+                {
+                    resolve(true)
+                }
+                else
+                {
+                    resolve(false)
+                }
+                
+            })
+        })
+    }
+
+    removeCurrentlyPlaying(chatId)
+    {
+        let sql = `delete from ${data.currentlyPlayingTableName} where ${data.currentlyPlayingTableColumns.chatId} = "${chatId}"`
+        this.db.run(sql,(err)=>{
+            if(err)
+            {
+                return console.log(err.message)
+            }
+            console.log(`${chatId} has finished his game`)
+        })
+    }
+
     chatExists(chatId)
     {
         let sql = `select count(1) from ${data.recordTableName} where ${data.recordTableColumns.chatId} = "${chatId}"`

@@ -9,7 +9,23 @@ let fs = require('fs')
 const data = require("./data.json")
 const Id = Utils.Id;
 
-exports.newGame = (chatId,api,name,toUserId) =>{
+exports.newGame = (chatId,api,name,toUserId,callBack,chatToState) =>{
+
+    chatToState[chatId] = {
+        state:1,
+        gameState:{
+            correctNumber:0,
+            currentIndex:4,
+            difficulty:0,
+            maxIndex:0,
+            currentTrial:1,
+            usedHints:0,
+            currentText:""
+        },
+        name:name,
+        activeGameRef:0
+    }
+
     //create out msg
     let outMsg = new TextOutMessage();
     outMsg.chatId = chatId;
@@ -27,13 +43,18 @@ exports.newGame = (chatId,api,name,toUserId) =>{
 } 
 
 exports.start = (chatId,api,name,toUserId,callBack,chatToState) =>{
+
+    if(chatId in chatToState)
+    {
+        delete chatToState[chatId]
+    }
     //create out msg
 
     let outMsg = new TextOutMessage();
     outMsg.chat_Id = chatId;
     outMsg.reference = Id();
     outMsg.to_user_id = toUserId;
-    outMsg.text = `Hello ${name} and welcome to the "Digital Master Mind"`
+    outMsg.text = `Welcome to the "Digital Master Mind"`
     api.send(JSON.stringify(outMsg));
 
     
@@ -47,7 +68,7 @@ exports.start = (chatId,api,name,toUserId,callBack,chatToState) =>{
 
  
     
-    chatToState[chatId] = {
+    /*chatToState[chatId] = {
         state:0,
         gameState:{
             correctNumber:0,
@@ -61,11 +82,14 @@ exports.start = (chatId,api,name,toUserId,callBack,chatToState) =>{
         name:name,
         activeGameRef:0
     };
-    chatToState[chatId].state = 0
+    chatToState[chatId].state = 0*/
     
 }
 
-exports.startGame = (chatId,api,name,toUserId,callBack,chatToState) =>{
+exports.startGame = (chatId,api,name,toUserId,callBack,chatToState,dataBase) =>{
+
+    dataBase.addCurrentlyPlaying(chatId);
+
     let outMsg = new TextOutMessage();
     outMsg.chatId = chatId;
     outMsg.reference = Id();
@@ -104,7 +128,10 @@ exports.startGame = (chatId,api,name,toUserId,callBack,chatToState) =>{
     
     outMsg.menu_ref = MenuItems.keypadMenuItems.reference
     outMsg.inline_menu = Menus.keypadMenu
-    api.send(JSON.stringify(outMsg));
+    setTimeout(function(){
+        api.send(JSON.stringify(outMsg));
+    },200)
+    
 
     let menu = new SetChatMenuOutMessage()
     funcs.setNavigationButton(chatId, MenuItems.gameMenuItems.reference, api);
@@ -277,6 +304,7 @@ exports.keypadEnter = (chatId,api,name,toUserId,callBack,chatToState,msgId,refer
             api.send(JSON.stringify(outMsg))
 
             dataBase.modifyRecord(chatId,difficulty,true)
+            dataBase.removeCurrentlyPlaying(chatId)
             this.start(chatId,api,name,toUserId,callBack,chatToState)
             
 
@@ -381,6 +409,8 @@ exports.solve = (chatId,api,name,toUserId,callBack,chatToState,dataBase) =>{
     api.send(JSON.stringify(outMsg));
 
     dataBase.modifyRecord(chatId,difficulty,false)
+    dataBase.removeCurrentlyPlaying(chatId)
+
     this.start(chatId,api,name,toUserId,callBack,chatToState);
     
 }
