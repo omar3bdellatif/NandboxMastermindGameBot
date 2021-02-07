@@ -1,0 +1,28 @@
+{
+    "tableName": "chats",
+    "recordTableName": "recordTable",
+    "dbPath":"./activeChats.db",
+    "botName":"mastermind_nb",
+    "recordTableColumns":
+    {
+        "chatId":"chatId",
+        "name":"name",
+        "totalGames":"totalGames",
+        "lowGames": "lowGames",
+        "lowWon": "lowWon",
+        "lowLost": "lowLost",
+        "mediumGames": "mediumGames",
+        "mediumWon": "mediumWon",
+        "mediumLost": "mediumLost",
+        "hardGames": "hardGames",
+        "hardWon": "hardWon",
+        "hardLost": "hardLost",
+        "impossibleGames": "impossibleGames",
+        "impossibleWon": "impossibleWon",
+        "impossibleLost": "impossibleLost"
+
+    },
+    "maxHints":2,
+    "rules":"Rules.txt",
+    "info":"Info.txt"
+}
