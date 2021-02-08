@@ -41,16 +41,7 @@ exports.startMenuItems = {
         item5:0,
         item6:0
     },
-    reference:"startMenu",
-    next_menu:{
-        item1:references.startMenu,
-        item2:null,
-        item3:null,
-        item4:null,
-        item5:null,
-        item6:null
-    }
-    
+    reference:"startMenu" 
 };
 
 exports.newGameMenuItems = {
@@ -84,14 +75,7 @@ exports.newGameMenuItems = {
         item5:0,
 
     },
-    reference:"newGameMenu",
-    next_menu:{
-        item1:references.gameMenu,
-        item2:references.gameMenu,
-        item3:references.gameMenu,
-        item4:references.gameMenu,
-        item5:references.startMenu
-    }
+    reference:"newGameMenu"
 };
 
 exports.keypadMenuItems = {
@@ -158,50 +142,26 @@ exports.keypadMenuItems = {
 
     },
     currentIndex:0,
-    reference:"keypadMenu",
-    next_menu:{
-        item1:null,
-        item2:null,
-        item3:null,
-        item4:null,
-        item5:null,
-        item6:null,
-        item7:null,
-        item8:null,
-        item9:null,
-        item10:null,
-        item11:null,
-        item12:null,
-        item13:null,
-    }
+    reference:"keypadMenu"
 };
 
 exports.gameMenuItems = {
     items:{
         item1: "📖 Game Rules",
-        //item2: "🔍 Use Hint",
-        item3: "🏁 Solve Game",
+        item2: "🏁 Solve Game",
     },
     callBacks:{
         item1: "gameRules",
-        //item2: "useHint",
-        item3: "solveGame",
+        item2: "solveGame",
 
     },
     actions:{
         item1:MenuActions.gameRules,
-        //item2:MenuActions.start,
-        item3:MenuActions.solve
+        item2:MenuActions.solve
     },
     state:{
         item1: 2,
-        //item2: 0,
-        item3: 0
+        item2: 0
     },
-    reference:"gameMenu",
-    next_menu:{
-        item1:null,
-        //item2:null,
-        item3:references.startMenu
-    }
+    reference:"gameMenu"
 };

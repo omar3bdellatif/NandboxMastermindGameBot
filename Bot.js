@@ -45,11 +45,10 @@ nCallBack.onConnect = (_api) => {
     // it will go here if the bot connected to the server successfuly 
     api = _api;
     console.log("Authenticated");
+
+    //initialize the database in case the tables were not already created (first time)
     dataBase.createRecordTable();
     dataBase.createCurrentlyPlayingTable();
-
-    //create menu
-    
 }
 
 nCallBack.onReceive = incomingMsg => {
@@ -74,9 +73,8 @@ nCallBack.onReceive = incomingMsg => {
                 if(!(chatId in chatToState))
                 {
                     
-                    reference = Id();
+                    //reference = Id();
                     MenuItems.newGameMenuItems.actions.item5(chatId,api,incomingMsg.from.name,incomingMsg.from.id,null,chatToState,dataBase)
-                    //console.log(chatToState)
                     dataBase.addInitialRecord(chatId,incomingMsg.from.name)
                 }
                 break;
@@ -93,7 +91,6 @@ nCallBack.onReceive = incomingMsg => {
 // implement other nandbox.Callback() as per your bot need
 nCallBack.onReceiveObj = obj => {
     console.log("received object: ", obj);
-    
 }
 
 nCallBack.onClose = () => { }
@@ -106,24 +103,22 @@ nCallBack.onChatMenuCallBack = chatMenuCallback => {
 
     let callBack = chatMenuCallback.button_callback;
     let chatId = chatMenuCallback.chat.id;
-    let userId = chatMenuCallback.from.id;
-    let reference = Id();
+    //let userId = chatMenuCallback.from.id;
+    //let reference = Id();
+
     let validItems = {}
 
     if((chatId in chatToState)){
         let state = chatToState[chatId].state;
-        console.log(`state is ${state}`)
         
         switch (state)
         {
             //difficulty selection menu
             case 1:
-                console.log('Case 1')
                 validItems = MenuItems.newGameMenuItems;
                 break
             //game menu
             case 2:
-                console.log('Case 2')
                 validItems = MenuItems.gameMenuItems;
             default:
                 break;
@@ -134,22 +129,18 @@ nCallBack.onChatMenuCallBack = chatMenuCallback => {
         validItems = MenuItems.startMenuItems;
     }
 
-    console.log(`callback is ${callBack}`)
     for(key in validItems.callBacks)
     {
-        console.log(`current item is ${validItems.callBacks[key]}`)
         let menuItem = validItems.callBacks[key];
         if(callBack === menuItem)
         {
             //perform the action related to that item
-            console.log(`Menu Item clicked is ${validItems.callBacks[key]}`)
 
             validItems.actions[key](chatId,api,chatMenuCallback.from.name,chatMenuCallback.from.id,callBack,chatToState,dataBase)
             if(chatId in chatToState)
             {
                 chatToState[chatId].state = validItems.state[key]
             }
-            console.log(chatToState)
             return
         }
     }
@@ -178,7 +169,6 @@ nCallBack.onChatMenuCallBack = chatMenuCallback => {
 nCallBack.onInlineMessageCallback = inlineMsgCallback => {
     let chatId = inlineMsgCallback.chat.id;
 
-    //add and in currentlyPLaying
     dataBase.isCurrentlyPlaying(chatId).then((res) => {
         if(res)
         {
@@ -189,21 +179,15 @@ nCallBack.onInlineMessageCallback = inlineMsgCallback => {
                 let msgId = inlineMsgCallback.message_id;
                 let reference = inlineMsgCallback.reference;
                 let callBack = inlineMsgCallback.button_callback;
-                console.log(`state is: ${state}`)
                 if(state === 2 && reference == chatToState[chatId].activeGameRef)
                 {
                     let validItems = MenuItems.keypadMenuItems
                     for(key in validItems.callBacks)
                     {
-                        console.log(`current item is ${validItems.callBacks[key]}`)
                         let menuItem = validItems.callBacks[key];
                         if(callBack === menuItem)
                         {
-                            //perform the action related to that item
-                            console.log(`Menu Item clicked is ${validItems.callBacks[key]}`)
-            
                             validItems.actions[key](chatId,api,chatToState[chatId].name,userId,callBack,chatToState,msgId,reference,dataBase)
-                            //chatToState[chatId].state = validItems.state[key]
                             break
                         }
                     }

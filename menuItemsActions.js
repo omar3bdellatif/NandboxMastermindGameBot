@@ -34,12 +34,6 @@ exports.newGame = (chatId,api,name,toUserId,callBack,chatToState) =>{
     outMsg.text = "Please choose a difficulty"
     api.send(JSON.stringify(outMsg));
 
-    //create new menu
-    /*let menu = new SetChatMenuOutMessage()
-    funcs.setNavigationButton(chatId, "newGameMenu", api);
-    menu.chat_id = chatId;
-    menu.menus = Menus.newGameMenu;
-    api.send(JSON.stringify(menu))*/
 } 
 
 exports.start = (chatId,api,name,toUserId,callBack,chatToState) =>{
@@ -60,35 +54,11 @@ exports.start = (chatId,api,name,toUserId,callBack,chatToState) =>{
     
 
     //create new menu
-    /*let menu = new SetChatMenuOutMessage()
-    funcs.setNavigationButton(chatId, "startMenu", api);
-    menu.chat_id = chatId;
-    menu.menus = Menus.startMenu;
-    api.send(JSON.stringify(menu))*/
     let menu = new SetChatMenuOutMessage()
     funcs.setNavigationButton(chatId, "startMenu", api);
     menu.chat_id = chatId;
     menu.menus = [Menus.startMenu,Menus.newGameMenu,Menus.gameMenu];
     api.send(JSON.stringify(menu))
-    
-
- 
-    
-    /*chatToState[chatId] = {
-        state:0,
-        gameState:{
-            correctNumber:0,
-            currentIndex:4,
-            difficulty:0,
-            maxIndex:0,
-            currentTrial:1,
-            usedHints:0,
-            currentText:""
-        },
-        name:name,
-        activeGameRef:0
-    };
-    chatToState[chatId].state = 0*/
     
 }
 
@@ -138,12 +108,6 @@ exports.startGame = (chatId,api,name,toUserId,callBack,chatToState,dataBase) =>{
         api.send(JSON.stringify(outMsg));
     },200)
     
-
-    /*let menu = new SetChatMenuOutMessage()
-    funcs.setNavigationButton(chatId, MenuItems.gameMenuItems.reference, api);
-    menu.chat_id = chatId;
-    menu.menus = Menus.gameMenu;
-    api.send(JSON.stringify(menu))*/
 
 
     if(callBack == "low" || callBack == "medium" || callBack == "hard"  || callBack == "impossible")
@@ -366,7 +330,6 @@ exports.keypadEnter = (chatId,api,name,toUserId,callBack,chatToState,msgId,refer
                     currentText = funcs.addNewLine(currentText,`${chatToState[chatId].gameState.currentTrial}.  _ _ _ _`,true)
                 }
                 
-                //currentText = currentText+`  ${numberOfMatches}:${numberOfExactMatches}\n${chatToState[chatId].gameState.currentTrial}.  _ _ _ _`;
                 chatToState[chatId].gameState.currentText = currentText
             }
             else
@@ -383,7 +346,6 @@ exports.keypadEnter = (chatId,api,name,toUserId,callBack,chatToState,msgId,refer
                     currentText = funcs.addNewLine(currentText,`${chatToState[chatId].gameState.currentTrial}.  _ _ _ _ _`,true)
                 }
                 
-                //currentText = currentText+`  ${numberOfMatches}:${numberOfExactMatches}\n${chatToState[chatId].gameState.currentTrial}.  _ _ _ _ _`;
                 chatToState[chatId].gameState.currentText = currentText
             }
             
@@ -478,18 +440,8 @@ exports.hint = (chatId,api,name,toUserId,callBack,chatToState,msgId,reference)=>
 
     }
 
-    /*if(difficulty !== "impossible")
-    {
-        maxHints = 4;
-    }
-    else
-    {
-        maxHints = 5;
-    }*/
     maxHints = data.maxHints;
-    
-
-
+ 
     if(usedHints >= maxHints)
     {
         let outMsg = new TextOutMessage()
@@ -501,16 +453,11 @@ exports.hint = (chatId,api,name,toUserId,callBack,chatToState,msgId,reference)=>
         return;
     }
 
-    
-
-    //to be updated
-    //usedHints++;
 
     let revealedNumber = chatToState[chatId].gameState.correctNumber[usedHints];
     let replacedIndex = 4 + (2*usedHints)
     if(usedHints == 0)
     {   
-        //replacedIndex -= 1;   
         hintText = funcs.replaceChar(hintText,replacedIndex,revealedNumber)
         currentText = funcs.addNewLine(currentText,hintText)
     }
@@ -557,8 +504,8 @@ exports.getRecord = (chatId,api,name,toUserId,callBack,chatToState,dataBase) =>{
         let impossibleGames = res[data.recordTableColumns.impossibleGames]
         let impossibleWon = res[data.recordTableColumns.impossibleWon]
         let impossibleLost = res[data.recordTableColumns.impossibleLost]
-
-        let messageText = `Your total games played: ${totalGames}\n\nLOW\nGames: ${lowGames}\nLost: ${lowLost}\nWon: ${lowWon}\n\nMEDIUM\nGames:${mediumGames}\nLost:${mediumLost}\nWon: ${mediumWon}\n\nHARD\nGames: ${hardGames}\nLost: ${hardLost}\nWon: ${hardWon}\n\nImpossible\nGames: ${impossibleGames}\nLost: ${impossibleLost}\nWon: ${impossibleWon}`
+        
+        let messageText = `Your total games played: ${totalGames}\n\n⚪LOW\nGames: ${lowGames}\nLost: ${lowLost}\nWon: ${lowWon}\n\n🔵MEDIUM\nGames:${mediumGames}\nLost:${mediumLost}\nWon: ${mediumWon}\n\n🔴HARD\nGames: ${hardGames}\nLost: ${hardLost}\nWon: ${hardWon}\n\n⚫Impossible\nGames: ${impossibleGames}\nLost: ${impossibleLost}\nWon: ${impossibleWon}`
         let outMsg = new TextOutMessage()
         outMsg.chat_id = chatId;
         outMsg.reference = Id();
@@ -582,8 +529,8 @@ exports.getTopRecords = (chatId,api,name,toUserId,callBack,chatToState,dataBase)
             dataBase.getTopHardRecords().then((resHard) => {
                 dataBase.getTopImpossibleRecords().then((resImp) => {
                     let messageText = ""
-
-                    messageText += "Top LOW Challengers (by wins)\n"
+                    
+                    messageText += "Top ⚪LOW Challengers (by wins)\n"
 
                     let order = 1;
                     for(i = 0; i< resLow.length;i++)
@@ -592,7 +539,7 @@ exports.getTopRecords = (chatId,api,name,toUserId,callBack,chatToState,dataBase)
                         order += 1;
                     }
 
-                    messageText += "\nTop MEDIUM Challengers (by wins)\n"
+                    messageText += "\nTop 🔵MEDIUM Challengers (by wins)\n"
 
                     order = 1;
                     for(i = 0; i< resMed.length;i++)
@@ -601,7 +548,7 @@ exports.getTopRecords = (chatId,api,name,toUserId,callBack,chatToState,dataBase)
                         order += 1;
                     }
 
-                    messageText += "\nTop HARD Challengers (by wins)\n"
+                    messageText += "\nTop 🔴HARD Challengers (by wins)\n"
 
                     order = 1;
                     for(i = 0; i< resHard.length;i++)
@@ -610,7 +557,7 @@ exports.getTopRecords = (chatId,api,name,toUserId,callBack,chatToState,dataBase)
                         order += 1;
                     }
 
-                    messageText += "\nTop IMPOSSIBLE Challengers (by wins)\n"
+                    messageText += "\nTop ⚫IMPOSSIBLE Challengers (by wins)\n"
 
                     order = 1;
                     for(i = 0; i< resImp.length;i++)

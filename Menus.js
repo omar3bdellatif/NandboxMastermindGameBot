@@ -19,10 +19,6 @@ let row3ButtonsStartMenu = [
     funcs.createButton(MenuItems.startMenuItems.items.item5,MenuItems.startMenuItems.callBacks.item5,1,"lightgrey","black",null,null,MenuItems.startMenuItems.reference,1),
     funcs.createButton(MenuItems.startMenuItems.items.item6,MenuItems.startMenuItems.callBacks.item6,2,"lightgrey","black",null,null,MenuItems.startMenuItems.reference,1)
 ]
-/*let row4ButtonsStartMenu = [
-    funcs.createButton(MenuItems.startMenuItems.items.item7,MenuItems.startMenuItems.callBacks.item7,1,"lightgrey","black",null,null,null,1),
-    funcs.createButton(MenuItems.startMenuItems.items.item8,MenuItems.startMenuItems.callBacks.item8,2,"lightgrey","black",null,null,null,1)
-]*/
 
 let rowsStartMenu = [new Row(row1ButtonsStartMenu,1),new Row(row2ButtonsStartMenu,2),new Row(row3ButtonsStartMenu,3)]
 exports.startMenu = new Menu(rowsStartMenu,'startMenu')
@@ -94,11 +90,9 @@ exports.keypadMenu = [new Menu(rowsKeypadMenu,MenuItems.keypadMenuItems.referenc
 let row1ButtonsGameMenu = [
     funcs.createButton(MenuItems.gameMenuItems.items.item1,MenuItems.gameMenuItems.callBacks.item1,1,"lightgrey","white",null,null,MenuItems.gameMenuItems.reference,1)
 ]
-/*let row2ButtonsGameMenu = [
-    funcs.createButton(MenuItems.gameMenuItems.items.item2,MenuItems.gameMenuItems.callBacks.item2,1,"lightgrey","white",null,null,null,1)
-]*/
+
 let row2ButtonsGameMenu = [
-    funcs.createButton(MenuItems.gameMenuItems.items.item3,MenuItems.gameMenuItems.callBacks.item3,1,"lightgrey","white",null,null,MenuItems.startMenuItems.reference,1)
+    funcs.createButton(MenuItems.gameMenuItems.items.item2,MenuItems.gameMenuItems.callBacks.item2,1,"lightgrey","white",null,null,MenuItems.startMenuItems.reference,1)
 ]
 
 let rowsGameMenu = [new Row(row1ButtonsGameMenu,1),new Row(row2ButtonsGameMenu,2)]

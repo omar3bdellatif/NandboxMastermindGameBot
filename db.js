@@ -62,7 +62,7 @@ class dataBase {
             {
                 return console.log(err.message)
             }
-            console.log(`Table has been created successfully`)
+            console.log(`Record table has been created successfully`)
         })
     }
 
@@ -77,7 +77,7 @@ class dataBase {
             {
                 return console.log(err.message)
             }
-            console.log(`Table has been created successfully`)
+            console.log(`Currently playing table has been created successfully`)
         })
     }
 
@@ -351,19 +351,7 @@ class dataBase {
 
 
 
-    /*addWords(chatId,words)
-    {
-        let placeholders = words.map((word) => '(?)').join(',');
-        let sql = `INSERT INTO Table${chatId}(words) VALUES ${placeholders}`;
-
-        this.db.run(sql,words,(err) =>{
-            if(err)
-            {
-                return console.log(err.message)
-            }
-            console.log(`Words ${words} have been registered as bad words for chat with ID ${chatId}`)
-        })
-    }*/
+//EXTRA FUNCTIONS THAT COULD BE USED LATER
 
     addValues(chatId,state,correctNumber,difficulty,maxIndex,currentTrial,usedHints,currentText,name,activeGameRef)
     {
@@ -421,11 +409,9 @@ class dataBase {
         }
         tableNames = tableNames.slice(0,tableNames.length-1)+")"
 
-        console.log(`values: ${values}`)
         
         let placeholders = values.map((value) => '(?)').join(',');
         let sql = `INSERT INTO ${data.tableName}${tableNames} VALUES (${placeholders})`;
-        console.log(sql)
 
         this.db.run(sql,values,(err) =>{
             if(err)
@@ -479,7 +465,6 @@ class dataBase {
         updateStatement = updateStatement.slice(0,updateStatement.length-1);
 
         let sql = `UPDATE ${data.tableName} SET ${updateStatement} WHERE chatId = "${chatId}"`
-        console.log(sql)
         this.db.run(sql,(err) =>{
             if(err)
             {
@@ -489,24 +474,6 @@ class dataBase {
         })
     }
 
-    removeRow(chatId)
-    {
-        let sql = `DELETE FROM ${data.tableName} `
-    }
-
-    /*removeWords(chatId,words)
-    {
-        let placeholders = words.map((word) => '?').join(',');
-        let sql = `DELETE FROM Table${chatId} WHERE words IN (${placeholders})`;
-
-        this.db.run(sql,words,(err) =>{
-            if(err)
-            {
-                return console.log(err.message)
-            }
-            console.log(`Words ${words} have been removed from bad words list for chat with ID ${chatId}`)
-        })
-    }*/
 
 }
 
