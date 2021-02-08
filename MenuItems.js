@@ -1,5 +1,12 @@
 const MenuActions = require("./menuItemsActions");
 
+const references = {
+    startMenu: "startMenu",
+    newGameMenu: "newGameMenu",
+    keypadMenu: "keypadMenu",
+    gameMenu:"gameMenu"
+};
+
 exports.startMenuItems = {
     items:{
         item1:"🎮 New Game",
@@ -34,9 +41,17 @@ exports.startMenuItems = {
         item5:0,
         item6:0
     },
-    reference:"startMenu"
+    reference:"startMenu",
+    next_menu:{
+        item1:references.startMenu,
+        item2:null,
+        item3:null,
+        item4:null,
+        item5:null,
+        item6:null
+    }
     
-}
+};
 
 exports.newGameMenuItems = {
     items:{
@@ -69,8 +84,15 @@ exports.newGameMenuItems = {
         item5:0,
 
     },
-    reference:"newGameMenu"
-}
+    reference:"newGameMenu",
+    next_menu:{
+        item1:references.gameMenu,
+        item2:references.gameMenu,
+        item3:references.gameMenu,
+        item4:references.gameMenu,
+        item5:references.startMenu
+    }
+};
 
 exports.keypadMenuItems = {
     items:{
@@ -136,8 +158,23 @@ exports.keypadMenuItems = {
 
     },
     currentIndex:0,
-    reference:"keypadMenu"
-}
+    reference:"keypadMenu",
+    next_menu:{
+        item1:null,
+        item2:null,
+        item3:null,
+        item4:null,
+        item5:null,
+        item6:null,
+        item7:null,
+        item8:null,
+        item9:null,
+        item10:null,
+        item11:null,
+        item12:null,
+        item13:null,
+    }
+};
 
 exports.gameMenuItems = {
     items:{
@@ -161,5 +198,10 @@ exports.gameMenuItems = {
         //item2: 0,
         item3: 0
     },
-    reference:"gameMenu"
-}
+    reference:"gameMenu",
+    next_menu:{
+        item1:null,
+        //item2:null,
+        item3:references.startMenu
+    }
+};

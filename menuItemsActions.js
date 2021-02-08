@@ -35,11 +35,11 @@ exports.newGame = (chatId,api,name,toUserId,callBack,chatToState) =>{
     api.send(JSON.stringify(outMsg));
 
     //create new menu
-    let menu = new SetChatMenuOutMessage()
+    /*let menu = new SetChatMenuOutMessage()
     funcs.setNavigationButton(chatId, "newGameMenu", api);
     menu.chat_id = chatId;
     menu.menus = Menus.newGameMenu;
-    api.send(JSON.stringify(menu))
+    api.send(JSON.stringify(menu))*/
 } 
 
 exports.start = (chatId,api,name,toUserId,callBack,chatToState) =>{
@@ -60,11 +60,17 @@ exports.start = (chatId,api,name,toUserId,callBack,chatToState) =>{
     
 
     //create new menu
-    let menu = new SetChatMenuOutMessage()
+    /*let menu = new SetChatMenuOutMessage()
     funcs.setNavigationButton(chatId, "startMenu", api);
     menu.chat_id = chatId;
     menu.menus = Menus.startMenu;
+    api.send(JSON.stringify(menu))*/
+    let menu = new SetChatMenuOutMessage()
+    funcs.setNavigationButton(chatId, "startMenu", api);
+    menu.chat_id = chatId;
+    menu.menus = [Menus.startMenu,Menus.newGameMenu,Menus.gameMenu];
     api.send(JSON.stringify(menu))
+    
 
  
     
@@ -133,11 +139,11 @@ exports.startGame = (chatId,api,name,toUserId,callBack,chatToState,dataBase) =>{
     },200)
     
 
-    let menu = new SetChatMenuOutMessage()
+    /*let menu = new SetChatMenuOutMessage()
     funcs.setNavigationButton(chatId, MenuItems.gameMenuItems.reference, api);
     menu.chat_id = chatId;
     menu.menus = Menus.gameMenu;
-    api.send(JSON.stringify(menu))
+    api.send(JSON.stringify(menu))*/
 
 
     if(callBack == "low" || callBack == "medium" || callBack == "hard"  || callBack == "impossible")
@@ -535,7 +541,9 @@ exports.hint = (chatId,api,name,toUserId,callBack,chatToState,msgId,reference)=>
 }
 
 exports.getRecord = (chatId,api,name,toUserId,callBack,chatToState,dataBase) =>{
+    console.log(dataBase)
     dataBase.getAllRecords(chatId).then((res) => {
+        
         let totalGames = res[data.recordTableColumns.totalGames];
         let lowGames = res[data.recordTableColumns.lowGames]
         let lowWon = res[data.recordTableColumns.lowWon]
@@ -557,6 +565,13 @@ exports.getRecord = (chatId,api,name,toUserId,callBack,chatToState,dataBase) =>{
         outMsg.to_user_id = toUserId;
         outMsg.text = messageText;
         api.send(JSON.stringify(outMsg));
+    }).catch((res)=>{
+        let messageText = "Your record isn't being saved. Please type '/start' to save your record."
+        let outMsg = new TextOutMessage()
+        outMsg.chat_id = chatId;
+        outMsg.reference = Id();
+        outMsg.to_user_id = toUserId;
+        outMsg.text = messageText;
     })
 }
 

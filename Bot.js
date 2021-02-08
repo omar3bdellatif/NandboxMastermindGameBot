@@ -47,6 +47,9 @@ nCallBack.onConnect = (_api) => {
     console.log("Authenticated");
     dataBase.createRecordTable();
     dataBase.createCurrentlyPlayingTable();
+
+    //create menu
+    
 }
 
 nCallBack.onReceive = incomingMsg => {
@@ -223,10 +226,6 @@ nCallBack.onInlineMessageCallback = inlineMsgCallback => {
 
                 return
             }
-            
-        }
-        else
-        {
             
         }
     })
