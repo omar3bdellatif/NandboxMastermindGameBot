@@ -36,7 +36,7 @@ exports.newGame = (chatId,api,name,toUserId,callBack,chatToState) =>{
 
 } 
 
-exports.start = (chatId,api,name,toUserId,callBack,chatToState) =>{
+exports.start = (chatId,api,name,toUserId,callBack,chatToState,firstTime = true) =>{
 
     if(chatId in chatToState)
     {
@@ -54,11 +54,15 @@ exports.start = (chatId,api,name,toUserId,callBack,chatToState) =>{
     
 
     //create new menu
-    let menu = new SetChatMenuOutMessage()
-    funcs.setNavigationButton(chatId, "startMenu", api);
-    menu.chat_id = chatId;
-    menu.menus = [Menus.startMenu,Menus.newGameMenu,Menus.gameMenu];
-    api.send(JSON.stringify(menu))
+    if(firstTime)
+    {
+        let menu = new SetChatMenuOutMessage()
+        funcs.setNavigationButton(chatId, "startMenu", api);
+        menu.chat_id = chatId;
+        menu.menus = [Menus.startMenu,Menus.newGameMenu,Menus.gameMenu];
+        api.send(JSON.stringify(menu))
+    }
+    
     
 }
 
@@ -379,7 +383,7 @@ exports.solve = (chatId,api,name,toUserId,callBack,chatToState,dataBase) =>{
     dataBase.modifyRecord(chatId,difficulty,false)
     dataBase.removeCurrentlyPlaying(chatId)
 
-    this.start(chatId,api,name,toUserId,callBack,chatToState);
+    this.start(chatId,api,name,toUserId,callBack,chatToState,false);
     
 }
 
@@ -504,7 +508,7 @@ exports.getRecord = (chatId,api,name,toUserId,callBack,chatToState,dataBase) =>{
         let impossibleGames = res[data.recordTableColumns.impossibleGames]
         let impossibleWon = res[data.recordTableColumns.impossibleWon]
         let impossibleLost = res[data.recordTableColumns.impossibleLost]
-        
+
         let messageText = `Your total games played: ${totalGames}\n\n⚪LOW\nGames: ${lowGames}\nLost: ${lowLost}\nWon: ${lowWon}\n\n🔵MEDIUM\nGames:${mediumGames}\nLost:${mediumLost}\nWon: ${mediumWon}\n\n🔴HARD\nGames: ${hardGames}\nLost: ${hardLost}\nWon: ${hardWon}\n\n⚫Impossible\nGames: ${impossibleGames}\nLost: ${impossibleLost}\nWon: ${impossibleWon}`
         let outMsg = new TextOutMessage()
         outMsg.chat_id = chatId;
